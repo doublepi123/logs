@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"runtime"
+	"runtime/debug"
 	"time"
 
 	"github.com/google/uuid"
@@ -119,4 +120,10 @@ func CtxFatal(ctx context.Context, msg string, fields ...zap.Field) {
 
 func CtxWarn(ctx context.Context, msg string, fields ...zap.Field) {
 	logger.Warn(msg, buildField(ctx, fields...)...)
+}
+
+func CtxRecover(ctx context.Context) {
+	if r := recover(); r != nil {
+		CtxPanic(ctx, "panic happened!", zap.Any("reason", r), zap.String("stack", string(debug.Stack())))
+	}
 }
